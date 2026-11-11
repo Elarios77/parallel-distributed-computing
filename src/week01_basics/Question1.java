@@ -56,7 +56,19 @@ public class Question1 {
         last.join();
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
+        String variant = args.length > 0 ? args[0] : DEFAULT_VARIANT;
+        System.out.println("Variant: " + variant);
 
+        long start = System.nanoTime();
+
+        switch (variant) {
+            case "a" -> noJoin();
+            case "b" -> joinLastOnly();
+            default -> withArray();
+        }
+
+        long ms = (System.nanoTime() - start) / 1_000_000;
+        System.out.println("main: threads all done (" + ms + " ms)");
     }
 }
