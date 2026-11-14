@@ -7,10 +7,10 @@ The goal of this lab is to get familiar with creating, starting and joining thre
 
 The exercises build on two programs provided by the course, located in [`provided/`]:
 
-| File | Description |
-|------|-------------|
-| `HelloThread.java` | Creates 20 threads using a class that extends `Thread`, starts them and waits for all of them with `join()`. |
-| `HelloThreadArgs.java` | Same as above, but passes arguments (thread ID and total number of threads) to each thread |
+| File                   | Description                                                                                                  |
+|------------------------|--------------------------------------------------------------------------------------------------------------|
+| `HelloThread.java`     | Creates 20 threads using a class that extends `Thread`, starts them and waits for all of them with `join()`. |
+| `HelloThreadArgs.java` | Same as above, but passes arguments (thread ID and total number of threads) to each thread                   |
 
 ## Assignment
 
@@ -46,11 +46,11 @@ All threads print **concurrently**, not sequentially.
 - What do you observe when all threads print at the same time?
 ## Solutions
 
-| Question | Solution
-|----------|----------
-| 1 | [`Question1`]
-| 2 | [`Question2`]
-| 3 | [`Question3`]
-| 4 | [`Question4`]
+| Question | Solution      |
+|----------|---------------|
+| 1        | [`Question1`] |
+| 2        | [`Question2`] |
+| 3        | [`Question3`] |
+| 4        | [`Question4`] |
 
 > **Note:** All solutions use `Runnable` (or lambdas) instead of extending `Thread`, which separates the task from the thread that executes it.
