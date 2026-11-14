@@ -13,62 +13,89 @@ package week01_basics;
 
 public class Question1 {
 
-    static final int NUM_THREADS = 10;
-    static final String DEFAULT_VARIANT = "array";
+    public static void main(String[] args) {
+        int numThreads = 10;
+        int variant = 1;
 
-    static Runnable task(int id) {
-        return () -> {
-            try {
-                Thread.sleep((NUM_THREADS - id) * 50L);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        long start = System.currentTimeMillis(); //Returns the current time in milliseconds
+
+        if (variant == 1) {
+            /* 1) with array: start all threads, then join all of them */
+
+            Thread[] threads = new Thread[numThreads];
+
+            for (int i = 0; i < numThreads; i++) {
+                threads[i] = new Thread(new SleepRunnable(i, numThreads));
+                threads[i].start();
             }
-            System.out.println("Thread " + id + " finished");
-        };
+
+            for (Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (variant == 2) {
+            /* 2) no array so we loose reference and we can't call joi() */
+            for (int i = 0; i < numThreads; i++) {
+                Thread t = new Thread(new SleepRunnable(i, numThreads));
+                t.start();
+            }
+        } else if (variant == 3) {
+            /* 3) join() right after start(): each thread finishes before the next starts */
+            for (int i = 0; i < numThreads; i++) {
+                Thread t = new Thread(new SleepRunnable(i, numThreads));
+                t.start();
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            /* 4) one variable that is overwritten: only the last thread is joined */
+            Thread t = null;
+
+            for (int i = 0; i < numThreads; i++) {
+                t = new Thread(new SleepRunnable(i, numThreads));
+                t.start();
+            }
+
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        long elapsed = System.currentTimeMillis() - start;
+        System.out.println("In main: threads all done (" + elapsed + " ms)");
+    }
+}
+
+/**
+ * The code each thread executes
+ * Thread[i] sleeps (totalThreads - i ) * 50, so thread 0 finishes last and the last finishes first
+ */
+
+class SleepRunnable implements Runnable {
+
+    private final int myId;
+    private final int totalThreads;
+
+    public SleepRunnable(int id, int total) {
+        myId = id;
+        totalThreads = total;
     }
 
-    // Correct approach: start all threads first, then join all of them
-    static void withArray() throws InterruptedException {
-        Thread[] threads = new Thread[NUM_THREADS];
-        for (int i = 0; i < NUM_THREADS; i++) {
-            threads[i] = new Thread(task(i));
-            threads[i].start();
+    @Override
+    public void run() {
+        try {
+            Thread.sleep((totalThreads - myId) * 50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        for (Thread t : threads) {
-            t.join();
-        }
-    }
-
-    //This is when no references kept
-    static void noJoin() {
-        for (int i = 0; i < NUM_THREADS; i++) {
-            new Thread(task(i)).start();
-        }
-    }
-
-    //b)
-    static void joinLastOnly() throws InterruptedException {
-        Thread last = null;
-        for (int i = 0; i < NUM_THREADS; i++) {
-            last = new Thread(task(i));
-            last.start();
-        }
-        last.join();
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        String variant = args.length > 0 ? args[0] : DEFAULT_VARIANT;
-        System.out.println("Variant: " + variant);
-
-        long start = System.nanoTime();
-
-        switch (variant) {
-            case "a" -> noJoin();
-            case "b" -> joinLastOnly();
-            default -> withArray();
-        }
-
-        long ms = (System.nanoTime() - start) / 1_000_000;
-        System.out.println("main: threads all done (" + ms + " ms)");
+        System.out.println("Thread " + myId + " finished");
     }
 }
